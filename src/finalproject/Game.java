@@ -8,7 +8,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Menu;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -54,6 +53,8 @@ public class Game extends JComponent implements KeyListener, MouseMotionListener
     int mouseX = 640;
     int mouseY = 0;
     boolean buttonPressed = false;
+    boolean runGame = true;
+    boolean runMenu = true;
     //block
     ArrayList<Rectangle> background = new ArrayList<>();
     ArrayList<Rectangle> blocks = new ArrayList<>();
@@ -62,11 +63,12 @@ public class Game extends JComponent implements KeyListener, MouseMotionListener
     //enemies
     ArrayList<Rectangle> enemies = new ArrayList<>();
     int currentLevelHP = 1;
-    int numberOfEnemies = 10;
+    int numberOfEnemies = 0;
     ArrayList enemyHP = new ArrayList();
     //ArrayList<BufferedImage> enemies = new ArrayList<>();
     //another player
     Rectangle player = new Rectangle(630, 430, 50, 50);
+    int lives = 6;
     int moveX = 0;
     int moveY = 0;
     boolean inAir = false;
@@ -137,13 +139,23 @@ public class Game extends JComponent implements KeyListener, MouseMotionListener
                 g.drawImage(cobble, i, u, this);
             }
         }
-        for (Rectangle wall : blocks) {
-            g.drawImage(waterCobble, wall.x, wall.y, this);
+        if (level == 0) {
+            for (Rectangle wall : blocks) {
+                g.drawImage(waterCobble, wall.x, wall.y, this);
+            }
+
+            if (pressEnterCounter < 10) {
+                g.drawImage(pressEnter, 400, 300, this);
+            } else if (pressEnterCounter > 20) {
+                pressEnterCounter = 0;
+            }
+            pressEnterCounter++;
+        }else if(level == -1){
+            g.            
         }
 
 
-        //draw walls starting walls
-        //draw an image when the trugger is being pressed
+
         if (buttonPressed) {
             if (explosion == 1) {
                 g.drawImage(explosion1, x, y, this);
@@ -161,34 +173,34 @@ public class Game extends JComponent implements KeyListener, MouseMotionListener
 
         for (Rectangle block : enemies) {
             String smallEnemyDirection = direction(block.x, block.y, player.x, player.y);
-            if (smallEnemyDirection == "NE") {
+            if (smallEnemyDirection.equals("NE")) {
                 g.drawImage(smallEnemyNE, block.x, block.y, 50, 50, this);
-                block.x = block.x + 1;
-                block.y = block.y - 1;
-            } else if (smallEnemyDirection == "N") {
-                g.drawImage(smallEnemyN, block.x, block.y, 50, 50, this);
-                block.y = block.y - 2;
-            } else if (smallEnemyDirection == "NW") {
-                g.drawImage(smallEnemyNW, block.x, block.y, 50, 50, this);
-                block.x = block.x - 1;
-                block.y = block.y - 1;
-            } else if (smallEnemyDirection == "S") {
-                g.drawImage(smallEnemyS, block.x, block.y, 50, 50, this);
-                block.y = block.y + 2;
-            } else if (smallEnemyDirection == "SW") {
-                g.drawImage(smallEnemySW, block.x, block.y, 50, 50, this);
-                block.x = block.x - 1;
-                block.y = block.y + 1;
-            } else if (smallEnemyDirection == "SE") {
-                g.drawImage(smallEnemySE, block.x, block.y, 50, 50, this);
-                block.x = block.x + 1;
-                block.y = block.y + 1;
-            } else if (smallEnemyDirection == "E") {
-                g.drawImage(smallEnemyE, block.x, block.y, 50, 50, this);
                 block.x = block.x + 2;
-            } else if (smallEnemyDirection == "W") {
-                g.drawImage(smallEnemyW, block.x, block.y, 50, 50, this);
+                block.y = block.y - 2;
+            } else if (smallEnemyDirection.equals("N")) {
+                g.drawImage(smallEnemyN, block.x, block.y, 50, 50, this);
+                block.y = block.y - 3;
+            } else if (smallEnemyDirection.equals("NW")) {
+                g.drawImage(smallEnemyNW, block.x, block.y, 50, 50, this);
                 block.x = block.x - 2;
+                block.y = block.y - 2;
+            } else if (smallEnemyDirection.equals("S")) {
+                g.drawImage(smallEnemyS, block.x, block.y, 50, 50, this);
+                block.y = block.y + 3;
+            } else if (smallEnemyDirection.equals("SW")) {
+                g.drawImage(smallEnemySW, block.x, block.y, 50, 50, this);
+                block.x = block.x - 2;
+                block.y = block.y + 2;
+            } else if (smallEnemyDirection.equals("SE")) {
+                g.drawImage(smallEnemySE, block.x, block.y, 50, 50, this);
+                block.x = block.x + 2;
+                block.y = block.y + 2;
+            } else if (smallEnemyDirection.equals("E")) {
+                g.drawImage(smallEnemyE, block.x, block.y, 50, 50, this);
+                block.x = block.x + 3;
+            } else if (smallEnemyDirection.equals("W")) {
+                g.drawImage(smallEnemyW, block.x, block.y, 50, 50, this);
+                block.x = block.x - 3;
             }
         }
 
@@ -214,80 +226,29 @@ public class Game extends JComponent implements KeyListener, MouseMotionListener
             g.drawImage(playerImgW, player.x, player.y, 50, 50, this);
         }
 
-        for (Rectangle block : pillars) {
-            g.drawImage(pillar, block.x, block.y, this);
+        if (level >= 1) {
+            for (Rectangle block : pillars) {
+                g.drawImage(pillar, block.x, block.y, this);
+            }
+        } else if (level == 0) {
+            g.drawImage(pillar, 50, 5, this);
+            g.drawImage(pillar, 1050, 5, this);
+            g.drawImage(pillar, 50, 700, this);
+            g.drawImage(pillar, 1050, 700, this);
         }
 
 
         //draw the press enter text
-        if (pressEnterCounter < 10) {
-            g.drawImage(pressEnter, 400, 300, this);
-        } else if (pressEnterCounter > 20) {
-            pressEnterCounter = 0;
-        }
-        pressEnterCounter++;
+
+        g.drawString("" + lives, 400, 500);
 
         //draw crosshair
         g.drawImage(crosshair, x, y, 50, 50, this);
 
         // GAME DRAWING ENDS HERE
     }
-    
-    
-    public void menuScreen(){
-    for (int menuEY = 100; menuEY < 800; menuEY = menuEY + 50) {
-                enemies.add(new Rectangle(0, menuEY, 50, 50));
-                enemies.add(new Rectangle(1200, menuEY, 50, 50));
-                blocks.add(new Rectangle(50, menuEY + 50, 100, 100));
-                blocks.add(new Rectangle(1050, menuEY + 50, 100, 100));
-            }
-            for (int menuEX = 50; menuEX < 1100; menuEX = menuEX + 50) {
-                enemies.add(new Rectangle(menuEX, 0, 50, 50));
-                enemies.add(new Rectangle(menuEX, 900, 50, 50));
-                blocks.add(new Rectangle(menuEX, 100, 100, 100));
-                blocks.add(new Rectangle(menuEX, 800, 100, 100));
-            }
-}
-    
-    
-    public void mainGame(){
-            //add enemies
-            for (int i = 0; i < numberOfEnemies / 2; i++) {
-                int eX = (int) (Math.random() * (300 - 0 + 1)) + 0;
-                int eY = (int) (Math.random() * (924 - 0 + 1)) + 0;
-                enemies.add(new Rectangle(eX, eY, 50, 50));
-            }
-            for (int i = 0; i < numberOfEnemies / 2; i++) {
-                int eX = (int) (Math.random() * (1280 - 900 + 1)) + 900;
-                int eY = (int) (Math.random() * (924 - 0 + 1)) + 0;
-                enemies.add(new Rectangle(eX, eY, 50, 50));
-            }
 
-            //add pillars
-            for (int i = 0; i < 9; i++) {
-                int pX = (int) (Math.random() * (1280 - 0 + 1)) + 0;
-                int pY = (int) (Math.random() * (924 - 0 + 1)) + 0;
-                blocks.add(new Rectangle(pX, pY + 100, 90, 90));
-                pillars.add(new Rectangle(pX, pY, 50, 50));
-            }
-            if (enemies.isEmpty()) {
-                numberOfEnemies = numberOfEnemies + 10;
-            }
-        }
     public void run() {
-
-        if (level > 0) {
-            mainGame();
-            
-        } else if (level == 0) {
-            menuScreen();
-        }
-        
-        
-        
-        
-        
-
         //end of initial things to do
 
         // Used to keep track of time used to draw and update the game
@@ -313,6 +274,27 @@ public class Game extends JComponent implements KeyListener, MouseMotionListener
             // all your game rules and move is done in here
             // GAME LOGIC STARTS HERE 
 
+            if (lives <= 0) {
+                level = -1;
+            }
+
+            numberOfEnemies = level * 10;
+            if (level == 0) {
+                menuScreen();
+                if (enter) {
+                    level = 1;
+                }
+            } else if (level >= 1) {
+                mainGame();
+            } else if (level == -1) {
+                gameOver();
+            }
+            if (enemies.isEmpty() && level >= 1) {
+                enemies.clear();
+                level = level + 1;
+                runGame = true;
+
+            }
             //find the coordinates for the cross hair
             x = mouseX - 25;
             y = mouseY - 25;
@@ -347,6 +329,8 @@ public class Game extends JComponent implements KeyListener, MouseMotionListener
             //move player to new location
             player.x = player.x + moveX;
             player.y = player.y + moveY;
+
+
 
 
             Rectangle shoot = new Rectangle(mouseX - 8, mouseY - 8, 16, 16);
@@ -393,7 +377,7 @@ public class Game extends JComponent implements KeyListener, MouseMotionListener
                 }
             }
 
-            
+
             for (Rectangle enemy : enemies) {
                 for (Rectangle block : blocks) {
                     //is the player hitting a block
@@ -420,23 +404,14 @@ public class Game extends JComponent implements KeyListener, MouseMotionListener
                     }
                 }
             }
-
-            //enemy interaction
-            for (Rectangle block : enemies) {
-                //is the player hitting a block
-                if (player.intersects(block)) {
-                    //get the collision rectangle
-                    player.x = 630;
-                    player.y = 430;
+            Iterator<Rectangle> it = enemies.iterator();
+            while (it.hasNext()) {
+                Rectangle removeEnemy = it.next();
+                if (player.intersects(removeEnemy)) {
+                    it.remove();
+                    lives = lives - 1;
                 }
             }
-
-            if (level == 0) {
-                if (enter) {
-                    level = 1;
-                }
-            }
-
 
 
 
@@ -608,5 +583,70 @@ public class Game extends JComponent implements KeyListener, MouseMotionListener
 
     @Override
     public void mouseExited(MouseEvent e) {
+    }
+
+    public void mainGame() {
+        //remove all enemies and pillars
+        if (runGame) {
+
+            blocks.clear();
+            enemies.clear();
+            pillars.clear();
+
+            //add enemies
+            //add enemies on left hand side of the screen
+            for (int i = 0; i < numberOfEnemies / 2; i++) {
+                int eX = (int) (Math.random() * (300 - 0 + 1)) + 0;
+                int eY = (int) (Math.random() * (924 - 0 + 1)) + 0;
+                enemies.add(new Rectangle(eX, eY, 50, 50));
+            }
+            //add enemies on the right hand side of the screen
+            for (int i = 0; i < numberOfEnemies / 2; i++) {
+                int eX = (int) (Math.random() * (1280 - 900 + 1)) + 900;
+                int eY = (int) (Math.random() * (924 - 0 + 1)) + 0;
+                enemies.add(new Rectangle(eX, eY, 50, 50));
+            }
+
+            //add pillars
+            for (int i = 0; i < 9; i++) {
+                int pX = (int) (Math.random() * (1280 - 0 + 1)) + 0;
+                int pY = (int) (Math.random() * (924 - 0 + 1)) + 0;
+                blocks.add(new Rectangle(pX, pY + 100, 90, 90));
+                pillars.add(new Rectangle(pX, pY, 50, 50));
+            }
+        }
+
+        runGame = false;
+    }
+
+    public void menuScreen() {
+        if (runMenu) {
+
+            blocks.clear();
+            enemies.clear();
+            pillars.clear();
+
+
+            for (int menuEY = 100; menuEY < 800; menuEY = menuEY + 50) {
+                enemies.add(new Rectangle(0, menuEY, 50, 50));
+                enemies.add(new Rectangle(1200, menuEY, 50, 50));
+                blocks.add(new Rectangle(50, menuEY + 50, 100, 100));
+                blocks.add(new Rectangle(1050, menuEY + 50, 100, 100));
+            }
+            for (int menuEX = 50; menuEX < 1100; menuEX = menuEX + 50) {
+                enemies.add(new Rectangle(menuEX, 0, 50, 50));
+                enemies.add(new Rectangle(menuEX, 900, 50, 50));
+                blocks.add(new Rectangle(menuEX, 100, 100, 100));
+                blocks.add(new Rectangle(menuEX, 800, 100, 100));
+            }
+
+        }
+        runMenu = false;
+    }
+
+    public void gameOver() {
+        enemies.clear();
+        blocks.clear();
+        pillars.clear();
     }
 }
